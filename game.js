@@ -1,19 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Pac-Man</title>
-    <style>
-        canvas {
-            background-color: black;
-        }
-    </style>
-</head>
-<body>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
-    <script src="game.js"></script>
-</body>
-</html>
-
 // Get the game canvas
 const canvas = document.getElementById("gameCanvas");
 const context = canvas.getContext("2d");
@@ -98,4 +82,3 @@ function gameLoop() {
 
 // Start the game loop
 gameLoop();
-
