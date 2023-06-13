@@ -108,8 +108,8 @@
             // Check collision with paddles
             if (
                 (ballPosition.y + ballSize >= leftPaddlePosition && ballPosition.y <= leftPaddlePosition + paddleHeight && ballPosition.x <= paddleWidth) ||
-                (ballPosition.y + ballSize >= rightPaddlePosition && ballPosition.y <= rightPaddlePosition + paddleHeight && ballPosition.x + ballSize >= gameBoardWidth - paddle
-              ) {
+                (ballPosition.y + ballSize >= rightPaddlePosition && ballPosition.y <= rightPaddlePosition + paddleHeight && ballPosition.x + ballSize >= gameBoardWidth - paddleWidth)
+            ) {
                 ballDirection.x *= -1; // Reverse ball direction horizontally
             }
 
