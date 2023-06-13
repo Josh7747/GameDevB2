@@ -3,30 +3,33 @@
 <head>
     <style>
         #game-board {
-            width: 420px;
-            height: 420px;
+            width: 800px;
+            height: 400px;
             background-color: black;
             position: relative;
         }
 
-        .cell {
+        .paddle {
             width: 20px;
-            height: 20px;
+            height: 80px;
+            background-color: white;
             position: absolute;
         }
 
-        .pacman {
-            width: 20px;
-            height: 20px;
-            background-color: yellow;
-            border-radius: 50%;
+        #left-paddle {
+            left: 20px;
         }
 
-        .food {
-            width: 6px;
-            height: 6px;
+        #right-paddle {
+            right: 20px;
+        }
+
+        .ball {
+            width: 20px;
+            height: 20px;
             background-color: white;
             border-radius: 50%;
+            position: absolute;
         }
     </style>
 </head>
@@ -34,102 +37,75 @@
     <div id="game-board"></div>
 
     <script>
-        const board = [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
-            [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
-            [1, 0, 1, 0, 1, 1, 0, 1, 0, 1],
-            [1, 0, 1, 0, 1, 1, 0, 1, 0, 1],
-            [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
-            [1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-        ];
+        const gameBoardWidth = 800;
+        const gameBoardHeight = 400;
+        const paddleWidth = 20;
+        const paddleHeight = 80;
+        const ballSize = 20;
+        const paddleSpeed = 5;
 
-        const boardWidth = board[0].length;
-        const boardHeight = board.length;
-        const cellSize = 20;
+        let leftPaddlePosition = gameBoardHeight / 2 - paddleHeight / 2;
+        let rightPaddlePosition = gameBoardHeight / 2 - paddleHeight / 2;
+        let ballPosition = { x: gameBoardWidth / 2 - ballSize / 2, y: gameBoardHeight / 2 - ballSize / 2 };
+        let ballDirection = { x: -1, y: -1 };
 
-        let pacmanPosition = { x: 1, y: 1 };
-        let score = 0;
-
-        function createBoard() {
+        function createPaddle(id, top) {
             const gameBoard = document.getElementById("game-board");
-
-            for (let row = 0; row < boardHeight; row++) {
-                for (let col = 0; col < boardWidth; col++) {
-                    const cell = document.createElement("div");
-                    cell.className = "cell";
-                    cell.style.top = row * cellSize + "px";
-                    cell.style.left = col * cellSize + "px";
-
-                    if (board[row][col] === 1) {
-                        cell.style.backgroundColor = "blue";
-                    } else {
-                        const food = document.createElement("div");
-                        food.className = "food";
-                        cell.appendChild(food);
-                    }
-
-                    gameBoard.appendChild(cell);
-                }
-            }
+            const paddle = document.createElement("div");
+            paddle.className = "paddle";
+            paddle.id = id;
+            paddle.style.top = top + "px";
+            gameBoard.appendChild(paddle);
         }
 
-        function updatePacman() {
+        function createBall() {
             const gameBoard = document.getElementById("game-board");
-            const pacman = document.createElement("div");
-            pacman.className = "pacman";
-            pacman.style.top = pacmanPosition.y * cellSize + "px";
-            pacman.style.left = pacmanPosition.x * cellSize + "px";
-            gameBoard.appendChild(pacman);
+            const ball = document.createElement("div");
+            ball.className = "ball";
+            ball.style.top = ballPosition.y + "px";
+            ball.style.left = ballPosition.x + "px";
+            gameBoard.appendChild(ball);
+        }
+
+        function updatePaddle(id, position) {
+            const paddle = document.getElementById(id);
+            paddle.style.top = position + "px";
+        }
+
+        function updateBall() {
+            const ball = document.getElementsByClassName("ball")[0];
+            ball.style.top = ballPosition.y + "px";
+            ball.style.left = ballPosition.x + "px";
         }
 
         function handleKeyDown(event) {
-            const key = event.key;
-
-            switch (key) {
+            switch (event.key) {
                 case "ArrowUp":
-                    movePacman(0, -1);
+                    rightPaddlePosition -= paddleSpeed;
                     break;
                 case "ArrowDown":
-                    movePacman(0, 1);
+                    rightPaddlePosition += paddleSpeed;
                     break;
-                case "ArrowLeft":
-                    movePacman(-1, 0);
+                case "w":
+                    leftPaddlePosition -= paddleSpeed;
                     break;
-                case "ArrowRight":
-                    movePacman(1, 0);
+                case "s":
+                    leftPaddlePosition += paddleSpeed;
                     break;
             }
         }
 
-        function movePacman(deltaX, deltaY) {
-            const newPosX = pacmanPosition.x + deltaX;
-            const newPosY = pacmanPosition.y + deltaY;
+        function updateGame() {
+            // Update paddle positions
+            updatePaddle("left-paddle", leftPaddlePosition);
+            updatePaddle("right-paddle", rightPaddlePosition);
 
-            if (board[newPosY][newPosX] === 0) {
-                const gameBoard = document.getElementById("game-board");
-                const pacman = gameBoard.getElementsByClassName("pacman")[0];
-                pacman.style.top = newPosY * cellSize + "px";
-                pacman.style.left = newPosX * cellSize + "px";
-                pacmanPosition.x = newPosX;
-                pacmanPosition.y = newPosY;
+            // Update ball position
+            ballPosition.x += ballDirection.x;
+            ballPosition.y += ballDirection.y;
+            updateBall();
 
-                const food = gameBoard.getElementsByClassName("food")[0];
-                if (food && newPosX === parseInt(food.style.left) / cellSize && newPosY === parseInt(food.style.top) / cellSize) {
-                    gameBoard.removeChild(food);
-                    score++;
-                    console.log("Score: " + score);
-                }
-            }
-        }
-
-        createBoard();
-        updatePacman();
-
-        document.addEventListener("keydown", handleKeyDown);
-    </script>
-</body>
-</html>
+            // Check collision with paddles
+            if (
+                (ballPosition.y + ballSize >= leftPaddlePosition && ballPosition.y <= leftPaddlePosition + paddleHeight && ballPosition.x <= paddleWidth) ||
+                (ballPosition.y + ballSize >= rightPaddlePosition && ballPosition.y <= rightPaddlePosition + paddleHeight && ballPosition.x + ballSize >= gameBoardWidth - paddle
