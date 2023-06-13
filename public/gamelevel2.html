@@ -109,3 +109,40 @@
             if (
                 (ballPosition.y + ballSize >= leftPaddlePosition && ballPosition.y <= leftPaddlePosition + paddleHeight && ballPosition.x <= paddleWidth) ||
                 (ballPosition.y + ballSize >= rightPaddlePosition && ballPosition.y <= rightPaddlePosition + paddleHeight && ballPosition.x + ballSize >= gameBoardWidth - paddle
+              ) {
+                ballDirection.x *= -1; // Reverse ball direction horizontally
+            }
+
+            // Check collision with top and bottom walls
+            if (ballPosition.y <= 0 || ballPosition.y + ballSize >= gameBoardHeight) {
+                ballDirection.y *= -1; // Reverse ball direction vertically
+            }
+
+            // Check if ball is out of bounds
+            if (ballPosition.x < 0 || ballPosition.x + ballSize > gameBoardWidth) {
+                resetGame();
+            }
+        }
+
+        function resetGame() {
+            // Reset paddle positions
+            leftPaddlePosition = gameBoardHeight / 2 - paddleHeight / 2;
+            rightPaddlePosition = gameBoardHeight / 2 - paddleHeight / 2;
+
+            // Reset ball position and direction
+            ballPosition = { x: gameBoardWidth / 2 - ballSize / 2, y: gameBoardHeight / 2 - ballSize / 2 };
+            ballDirection = { x: -1, y: -1 };
+        }
+
+        function startGame() {
+            createPaddle("left-paddle", leftPaddlePosition);
+            createPaddle("right-paddle", rightPaddlePosition);
+            createBall();
+            setInterval(updateGame, 16); // Update game every 16ms (approximately 60 FPS)
+        }
+
+        document.addEventListener("keydown", handleKeyDown);
+        startGame();
+    </script>
+</body>
+</html>
